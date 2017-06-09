@@ -4,6 +4,7 @@ import com.darren.android.paytmlabschallenge.Models.IModels.ICurrencyModel;
 import com.google.gson.JsonObject;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Darren on 6/8/2017.
@@ -13,7 +14,7 @@ public class CurrencyModel implements ICurrencyModel {
 
     private String base, date;
     private JsonObject rates;
-    private Map<String, Double> ratesMap;
+    private TreeMap<String, Double> ratesMap;
 
     public CurrencyModel() {
     }
@@ -46,11 +47,11 @@ public class CurrencyModel implements ICurrencyModel {
         this.rates = rates;
     }
 
-    public Map<String, Double> getRatesMap() {
+    public TreeMap<String, Double> getRatesMap() {
         return ratesMap;
     }
 
-    public void setRatesMap(Map<String, Double> ratesMap) {
+    public void setRatesMap(TreeMap<String, Double> ratesMap) {
         this.ratesMap = ratesMap;
     }
 }

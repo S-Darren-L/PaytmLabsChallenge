@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Darren on 6/9/2017.
@@ -30,7 +31,9 @@ public class CurrencyModelDeserializer implements JsonDeserializer<CurrencyModel
         Gson gson = new Gson();
         Type type = new TypeToken<Map<String, Double>>(){}.getType();
         Map<String, Double> ratesMap = gson.fromJson(ratesObject, type);
-        currencyObject.setRatesMap(ratesMap);
+        TreeMap<String, Double> treeMap = new TreeMap<>();
+        treeMap.putAll(ratesMap);
+        currencyObject.setRatesMap(treeMap);
 
         return currencyObject;
     }

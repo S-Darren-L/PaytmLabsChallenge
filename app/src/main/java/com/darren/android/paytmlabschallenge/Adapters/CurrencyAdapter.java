@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.darren.android.paytmlabschallenge.R;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Darren on 6/8/2017.
@@ -32,7 +32,6 @@ public class CurrencyAdapter extends RecyclerView.Adapter<CurrencyAdapter.Curren
 
     public CurrencyAdapter(ArrayList currenciesList) {
         this.currenciesList = currenciesList;
-
     }
 
     @Override
@@ -45,13 +44,13 @@ public class CurrencyAdapter extends RecyclerView.Adapter<CurrencyAdapter.Curren
 
     @Override
     public void onBindViewHolder(CurrencyViewHolder holder, int position) {
-        Map.Entry<String, Double> item = getItem(position);
+        TreeMap.Entry<String, Double> item = getItem(position);
         codeTextView.setText(item.getKey());
         valueTextView.setText(item.getValue().toString());
     }
 
-    public Map.Entry<String, Double> getItem(int position) {
-        return (Map.Entry) currenciesList.get(position);
+    public TreeMap.Entry<String, Double> getItem(int position) {
+        return (TreeMap.Entry) currenciesList.get(position);
     }
 
     @Override

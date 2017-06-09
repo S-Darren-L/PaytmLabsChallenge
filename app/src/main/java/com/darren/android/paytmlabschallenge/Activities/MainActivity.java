@@ -32,11 +32,14 @@ import com.darren.android.paytmlabschallenge.Network.ApiRequests;
 import com.darren.android.paytmlabschallenge.Network.GsonGetRequest;
 import com.darren.android.paytmlabschallenge.R;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -200,13 +203,16 @@ public class MainActivity extends AppCompatActivity {
     private void setData(@NonNull
                          final CurrencyModel CurrencyObject) {
 
-        if(CurrencyObject.getRatesMap() != null)
+        if(CurrencyObject.getRatesMap() != null) {
+            ratesArray.clear();
             ratesArray.addAll(CurrencyObject.getRatesMap().entrySet());
+        }
         currencyAdapter.notifyDataSetChanged();
     }
 
     public void setData(@NonNull final ArrayList convertedCurrenciesArray) {
-        ratesArray = convertedCurrenciesArray;
+        ratesArray.clear();
+        ratesArray.addAll(convertedCurrenciesArray);
         currencyAdapter.notifyDataSetChanged();
     }
 
@@ -257,11 +263,20 @@ public class MainActivity extends AppCompatActivity {
             ArrayList resultArray = new ArrayList();
 
             for(int i = 0; i < ratesArrayParam.size(); i++){
-                Map.Entry<String, Double> item = (Map.Entry) ratesArrayParam.get(i);
-                item.setValue(item.getValue().doubleValue() * inputValueParam.doubleValue());
+                TreeMap.Entry<String, Double> item = (TreeMap.Entry) ratesArrayParam.get(i);
+                double result = formatSignificant(item.getValue().doubleValue() * inputValueParam.doubleValue(), 5);
+                item.setValue(result);
                 resultArray.add(i, item);
             }
             return resultArray;
+        }
+
+
+        private double formatSignificant(double value, int significant)
+        {
+            MathContext mathContext = new MathContext(significant, RoundingMode.DOWN);
+            BigDecimal bigDecimal = new BigDecimal(value, mathContext);
+            return bigDecimal.doubleValue();
         }
 
         protected void onPostExecute(ArrayList resultArray) {

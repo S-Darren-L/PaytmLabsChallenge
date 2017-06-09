@@ -2,7 +2,7 @@ package com.darren.android.paytmlabschallenge.Models.IModels;
 
 import com.google.gson.JsonObject;
 
-import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Darren on 6/8/2017.
@@ -21,7 +21,7 @@ public interface ICurrencyModel {
 
     public void setRates(JsonObject rates);
 
-    public Map<String, Double> getRatesMap();
+    public TreeMap<String, Double> getRatesMap();
 
-    public void setRatesMap(Map<String, Double> ratesMap);
+    public void setRatesMap(TreeMap<String, Double> ratesMap);
 }
