@@ -15,9 +15,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:name="com.darren.android.paytmlabschallenge.Base.App"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.MainActivity"
-            android:configChanges="orientation|keyboardHidden">
+        <activity
+            android:label="@string/app_name"
+            android:name="com.darren.android.paytmlabschallenge.Activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

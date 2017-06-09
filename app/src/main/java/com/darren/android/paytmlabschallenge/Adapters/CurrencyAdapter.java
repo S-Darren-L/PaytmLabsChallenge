@@ -6,37 +6,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.darren.android.paytmlabschallenge.Models.CurrencyModel;
 import com.darren.android.paytmlabschallenge.R;
 
-import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Darren on 6/8/2017.
  */
 
 public class CurrencyAdapter extends RecyclerView.Adapter<CurrencyAdapter.CurrencyViewHolder>{
-    private List<CurrencyModel> currenciesList;
+    private ArrayList currenciesList;
+    public TextView codeTextView, valueTextView;
 
     public class CurrencyViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.currencyCodeTextView)
-        TextView currencyCodeTextView;
-        @BindView(R.id.currencyValueTextView)
-        TextView currencyValueTextView;
-
         public CurrencyViewHolder(View view) {
             super(view);
-            ButterKnife.bind(this, view);
+
+            codeTextView = (TextView) view.findViewById(R.id.currencyCodeTextView);
+            valueTextView = (TextView) view.findViewById(R.id.currencyValueTextView);
         }
     }
 
 
-    public CurrencyAdapter(List<CurrencyModel> currenciesList) {
+    public CurrencyAdapter(ArrayList currenciesList) {
         this.currenciesList = currenciesList;
+
     }
 
     @Override
@@ -49,9 +45,13 @@ public class CurrencyAdapter extends RecyclerView.Adapter<CurrencyAdapter.Curren
 
     @Override
     public void onBindViewHolder(CurrencyViewHolder holder, int position) {
-        CurrencyModel currencyItem = currenciesList.get(position);
-        holder.currencyCodeTextView.setText(currencyItem.getCurrencyCode());
-        holder.currencyValueTextView.setText(currencyItem.getCurrencyValue());
+        Map.Entry<String, Double> item = getItem(position);
+        codeTextView.setText(item.getKey());
+        valueTextView.setText(item.getValue().toString());
+    }
+
+    public Map.Entry<String, Double> getItem(int position) {
+        return (Map.Entry) currenciesList.get(position);
     }
 
     @Override

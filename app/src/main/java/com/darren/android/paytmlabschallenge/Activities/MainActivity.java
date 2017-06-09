@@ -3,6 +3,7 @@ package com.darren.android.paytmlabschallenge.Activities;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -11,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -19,8 +21,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.darren.android.paytmlabschallenge.Adapters.CurrencyAdapter;
+import com.darren.android.paytmlabschallenge.Base.App;
 import com.darren.android.paytmlabschallenge.Models.CurrencyModel;
+import com.darren.android.paytmlabschallenge.Network.ApiRequests;
+import com.darren.android.paytmlabschallenge.Network.GsonGetRequest;
 import com.darren.android.paytmlabschallenge.R;
 
 import java.util.ArrayList;
@@ -32,6 +40,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String sTAG = "Tag";
+    private static final String DEBUG = "Debug";
 
     @BindView(R.id.currencySelectorSpinner)
     Spinner currencySelectorSpinner;
@@ -42,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String selectedCurrency;
     private double inputValue;
-    private List<CurrencyModel> currenciesList;
+    private ArrayList ratesArray;
 
     private CurrencyAdapter currencyAdapter;
 
@@ -51,6 +61,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init();
+    }
+
+    private void init() {
+        initUI();
+        performRequest();
+    }
+
+    private void initUI() {
         ButterKnife.bind(this);
 
         // Get current Locale
@@ -88,9 +107,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Init currency list, recycler view adapter and view
-        currenciesList = new ArrayList<>();
-        currencyAdapter = new CurrencyAdapter(currenciesList);
+        ratesArray =  new ArrayList();
+        currencyAdapter = new CurrencyAdapter(ratesArray);
 
         GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getApplicationContext(), 6, LinearLayoutManager.HORIZONTAL,false);
 
@@ -99,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
         currenciesRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         currenciesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         currenciesRecyclerView.setAdapter(currencyAdapter);
-
-        getCurrencyData();
     }
 
     public static List<String> getAllCurrencies() {
@@ -121,249 +137,58 @@ public class MainActivity extends AppCompatActivity {
         return toret;
     }
 
-    private void getCurrencyData() {
-        CurrencyModel currencyItem = new CurrencyModel("CAD", "1.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("USD", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAN", "1.41");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("CAD", "0.7");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("GWE", "1.2");
-        currenciesList.add(currencyItem);
-
-        currencyItem = new CurrencyModel("DRE", "3.1");
-        currenciesList.add(currencyItem);
+    private void performRequest() {
+        final GsonGetRequest<CurrencyModel> gsonGetRequest =
+                ApiRequests.geCurrencyObject
+                        (
+                                new Response.Listener<CurrencyModel>() {
+                                    @Override
+                                    public void onResponse(CurrencyModel CurrencyObject) {
+                                        onApiResponse(CurrencyObject);
+                                    }
+                                }
+                                ,
+                                new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        // Deal with the error here
+                                        onApiError(error);
+                                    }
+                                }
+                        );
+
+        App.addRequest(gsonGetRequest, sTAG);
+    }
+
+    private void onApiResponse(@NonNull
+                               final CurrencyModel CurrencyObject) {
+        setData(CurrencyObject);
+    }
+
+    private void onApiError(VolleyError error) {
+        String json;
+        NetworkResponse response = error.networkResponse;
+        if(response != null && response.data != null){
+            json = new String(response.data);
+            if(json != null)
+                Log.d(DEBUG, json);
+        } else if (error != null) {
+            Log.d(DEBUG, error.toString());
+        }
+    }
+
+    private void setData(@NonNull
+                         final CurrencyModel CurrencyObject) {
+
+        if(CurrencyObject.getRatesMap() != null)
+            ratesArray.addAll(CurrencyObject.getRatesMap().entrySet());
+    }
+
+    @Override
+    protected void onStop() {
+        App.cancelAllRequests(sTAG);
+
+        super.onStop();
     }
 
     private class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener{

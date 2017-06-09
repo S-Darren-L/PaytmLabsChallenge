@@ -1,16 +1,27 @@
 package com.darren.android.paytmlabschallenge.Models.IModels;
 
+import com.google.gson.JsonObject;
+
+import java.util.Map;
+
 /**
  * Created by Darren on 6/8/2017.
  */
 
 public interface ICurrencyModel {
+    public String getBase();
 
-    public String getCurrencyCode();
+    public void setBase (String base);
 
-    public void setCurrencyCode(String currencyCode);
+    public String getDate();
 
-    public String getCurrencyValue();
+    public void setDate(String currencyValue);
 
-    public void setCurrencyValue(String currencyValue);
+    public JsonObject getRates();
+
+    public void setRates(JsonObject rates);
+
+    public Map<String, Double> getRatesMap();
+
+    public void setRatesMap(Map<String, Double> ratesMap);
 }
