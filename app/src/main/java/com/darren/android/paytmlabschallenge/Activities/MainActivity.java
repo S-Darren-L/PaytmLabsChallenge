@@ -47,6 +47,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
     private static final String sTAG = "Tag";
     private static final String DEBUG = "Debug";
+    private static final String STATE_RATES = "Rates";
 
     @BindView(R.id.currencySelectorSpinner)
     Spinner currencySelectorSpinner;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private String selectedCurrency;
     private Double inputValue;
     private ArrayList ratesArray;
+    private GridLayoutManager recyclerLayoutManager;
 
     private CurrencyAdapter currencyAdapter;
     private boolean isConvert = false;
@@ -67,6 +69,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+
+        if (savedInstanceState == null)
+            ratesArray =  new ArrayList();
+
+        if(currencyAdapter == null)
+            currencyAdapter = new CurrencyAdapter(ratesArray);
+
+        if(recyclerLayoutManager == null) {
+            recyclerLayoutManager = new GridLayoutManager(getApplicationContext(), 4, LinearLayoutManager.VERTICAL, true);
+            currenciesRecyclerView.setHasFixedSize(true);
+            currenciesRecyclerView.setLayoutManager(recyclerLayoutManager);
+            currenciesRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+            currenciesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+            currenciesRecyclerView.setAdapter(currencyAdapter);
+        }
     }
 
     private void init() {
@@ -112,17 +129,12 @@ public class MainActivity extends AppCompatActivity {
                     inputValue = Double.parseDouble(inputValueString);
             }
         });
+    }
 
-        ratesArray =  new ArrayList();
-        currencyAdapter = new CurrencyAdapter(ratesArray);
-
-        GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getApplicationContext(), 4, LinearLayoutManager.VERTICAL, true);
-
-        currenciesRecyclerView.setHasFixedSize(true);
-        currenciesRecyclerView.setLayoutManager(recyclerLayoutManager);
-        currenciesRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        currenciesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        currenciesRecyclerView.setAdapter(currencyAdapter);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(STATE_RATES, ratesArray);
     }
 
     public static List<String> getAllCurrencies() {
@@ -271,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
             return resultArray;
         }
 
-
+        // Format calculate result
         private double formatSignificant(double value, int significant)
         {
             MathContext mathContext = new MathContext(significant, RoundingMode.DOWN);
