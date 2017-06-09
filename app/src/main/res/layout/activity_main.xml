@@ -30,12 +30,14 @@
                 android:id="@+id/currencySelectorSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_marginLeft="20dp"
+                android:layout_weight="1"/>
 
             <EditText
                 android:id="@+id/inputValueEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="@string/value"
@@ -46,13 +48,19 @@
             android:id="@+id/currencyConvertButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/convert"/>
+            android:layout_marginRight="20dp"
+            android:text="@string/convert"
+            android:onClick="Convert"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/currenciesRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"/>
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:scrollbars="vertical" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -38,6 +38,27 @@ public class ApiRequests {
                 );
     }
 
+    public static GsonGetRequest<CurrencyModel> geBaseCurrencyObject
+            (
+                    String locale,
+                    @NonNull
+                    final Response.Listener<CurrencyModel> listener,
+                    @NonNull
+                    final Response.ErrorListener errorListener
+            ) {
+        final String url = BuildConfig.apiDomainName + "/latest?base=" + locale;
+
+        return new GsonGetRequest<>
+                (
+                        url,
+                        new TypeToken<CurrencyModel>() {
+                        }.getType(),
+                        gson,
+                        listener,
+                        errorListener
+                );
+    }
+
 //    public static GsonGetRequest<ArrayList<CurrencyModel>> geCurrencyObjectArray
 //            (
 //                    @NonNull

@@ -1,6 +1,7 @@
 package com.darren.android.paytmlabschallenge.Activities;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView currenciesRecyclerView;
 
     private String selectedCurrency;
-    private double inputValue;
+    private Double inputValue;
     private ArrayList ratesArray;
 
     private CurrencyAdapter currencyAdapter;
-
+    private boolean isConvert = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             currentLocale = getResources().getConfiguration().locale;
         }
         Currency localeCurrency = Currency.getInstance(currentLocale);
+        selectedCurrency = localeCurrency.toString();
 
         // Set spinner adapter, resource, and default value
         List<String> currencyCodesArray = getAllCurrencies();
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         ratesArray =  new ArrayList();
         currencyAdapter = new CurrencyAdapter(ratesArray);
 
-        GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getApplicationContext(), 6, LinearLayoutManager.HORIZONTAL,false);
+        GridLayoutManager recyclerLayoutManager = new GridLayoutManager(getApplicationContext(), 4, LinearLayoutManager.VERTICAL, true);
 
         currenciesRecyclerView.setHasFixedSize(true);
         currenciesRecyclerView.setLayoutManager(recyclerLayoutManager);
@@ -137,10 +140,18 @@ public class MainActivity extends AppCompatActivity {
         return toret;
     }
 
+    public void Convert(View view){
+        if(inputValue != null){
+            isConvert = true;
+            performRequest();
+        }
+    }
+
     private void performRequest() {
         final GsonGetRequest<CurrencyModel> gsonGetRequest =
-                ApiRequests.geCurrencyObject
+                ApiRequests.geBaseCurrencyObject
                         (
+                                selectedCurrency,
                                 new Response.Listener<CurrencyModel>() {
                                     @Override
                                     public void onResponse(CurrencyModel CurrencyObject) {
@@ -162,7 +173,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void onApiResponse(@NonNull
                                final CurrencyModel CurrencyObject) {
-        setData(CurrencyObject);
+        if(isConvert == false)
+            setData(CurrencyObject);
+        else {
+            if (CurrencyObject.getRatesMap() != null){
+                ArrayList ratesArray = new ArrayList();
+                ratesArray.addAll(CurrencyObject.getRatesMap().entrySet());
+                ConvertParams convertParams = new ConvertParams(ratesArray, inputValue);
+                new CalculateConvertValue().execute(convertParams);
+            }
+        }
     }
 
     private void onApiError(VolleyError error) {
@@ -182,6 +202,12 @@ public class MainActivity extends AppCompatActivity {
 
         if(CurrencyObject.getRatesMap() != null)
             ratesArray.addAll(CurrencyObject.getRatesMap().entrySet());
+        currencyAdapter.notifyDataSetChanged();
+    }
+
+    public void setData(@NonNull final ArrayList convertedCurrenciesArray) {
+        ratesArray = convertedCurrenciesArray;
+        currencyAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -211,5 +237,35 @@ public class MainActivity extends AppCompatActivity {
                 INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         return true;
+    }
+
+    private static class ConvertParams {
+        ArrayList ratesArray;
+        Double inputValue;
+
+        ConvertParams(ArrayList ratesArray, Double inputValue) {
+            this.ratesArray = ratesArray;
+            this.inputValue = inputValue;
+        }
+    }
+
+    // Convert in another thread
+    private class CalculateConvertValue extends AsyncTask<ConvertParams, Void, ArrayList> {
+        protected ArrayList doInBackground(ConvertParams... convertParams) {
+            ArrayList ratesArrayParam = convertParams[0].ratesArray;
+            Double inputValueParam = convertParams[0].inputValue;
+            ArrayList resultArray = new ArrayList();
+
+            for(int i = 0; i < ratesArrayParam.size(); i++){
+                Map.Entry<String, Double> item = (Map.Entry) ratesArrayParam.get(i);
+                item.setValue(item.getValue().doubleValue() * inputValueParam.doubleValue());
+                resultArray.add(i, item);
+            }
+            return resultArray;
+        }
+
+        protected void onPostExecute(ArrayList resultArray) {
+            setData(resultArray);
+        }
     }
 }
